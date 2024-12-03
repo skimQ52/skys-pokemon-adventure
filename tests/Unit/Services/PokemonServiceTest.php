@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Services;
+namespace Tests\Unit\Services;
 
 use App\Models\Pokemon;
 use App\Models\User;
+use App\Services\PokemonService;
 use Database\Factories\UserFactory;
-use PHPUnit\Framework\TestCase;
+use Tests\TestCase;
 
 class PokemonServiceTest extends TestCase
 {
@@ -68,7 +69,7 @@ class PokemonServiceTest extends TestCase
         $this->assertTrue($spawnedPokemon->level <= $user->level);
 
         // Assert: Check that the Pokémon selected has a base_experience less than or equal to the max level * 10
-        $this->assertTrue($spawnedPokemon->base_experience <= $user->level * 10);
+        $this->assertTrue($spawnedPokemon->base_experience <= 40 + $user->level * 5);
 
     }
 
@@ -77,7 +78,6 @@ class PokemonServiceTest extends TestCase
     {
         // Arrange: Create a user
         $user = User::factory()->create([
-            'level' => 5,
             'xp' => 0,
         ]);
 
@@ -86,8 +86,11 @@ class PokemonServiceTest extends TestCase
             'name' => 'Bulbasaur',
             'base_experience' => 64,
             'hp' => 45,
-            'attack' => 49,
-            'defense' => 49,
+            'attack' => 62,
+            'special_attack' => 62,
+            'defense' => 63,
+            'special_defense' => 63,
+            'speed' => 63,
             'sprite' => 'bulbasaur.png',
             'cry' => 'bulbasaur_cry.mp3',
         ]);
