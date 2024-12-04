@@ -34,4 +34,21 @@ class PokemonService
 
         return $pokemons->first(); // Fallback if something goes wrong
     }
+
+    public function shouldPokemonRunAway(int $baseExperience, int $userLevel, int $pokemonLevel): bool
+    {
+        // Normalize values into a weighted percentage range (0-100).
+        $baseExpWeight = min($baseExperience / 10, 100); // Higher base experience increases runaway chance
+        $pokemonLevelWeight = min(($pokemonLevel / 100) * 50, 50); // Higher Pokémon level increases runaway chance
+        $userLevelWeight = min(($userLevel / 100) * 50, 50); // Higher user level decreases runaway chance
+
+        // Calculate the final runaway chance (higher values mean higher chance of running away)
+        $runawayChance = $baseExpWeight + $pokemonLevelWeight - $userLevelWeight;
+
+        $runawayChance = max(5, min($runawayChance, 95));
+
+        $randomChance = rand(0, 100);
+
+        return $randomChance < $runawayChance;
+    }
 }

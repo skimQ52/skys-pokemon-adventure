@@ -12,6 +12,7 @@ class UserPokemon extends Model
         'pokemon_id',
         'level',
         'experience',
+        'is_shiny',
     ];
 
     public function user(): BelongsTo
