@@ -74,7 +74,7 @@ class PokemonServiceTest extends TestCase
     }
 
     /** @test */
-    public function it_awards_xp_based_on_pokemon_hp()
+    public function it_awards_xp_based_on_pokemon_hp() // TODO: Move this test to UserController or wherever the encounter endpoint ends up
     {
         // Arrange: Create a user
         $user = User::factory()->create([

@@ -55,4 +55,25 @@ class User extends Authenticatable
     {
         return $this->hasMany(UserPokemon::class);
     }
+
+    public function getLevelFromXp(int $xp): int
+    {
+        $level = 1;
+        $xpForNextLevel = self::xpRequiredForLevel($level);
+
+        while ($xp >= $xpForNextLevel) {
+            $xp -= $xpForNextLevel;
+            $level++;
+            $xpForNextLevel = self::xpRequiredForLevel($level);
+        }
+
+        return $level;
+    }
+
+    private static function xpRequiredForLevel(int $level): int
+    {
+        $A = 50; // Quadratic coefficient
+        $B = 100; // Linear coefficient
+        return $A * ($level ** 2) + $B * $level;
+    }
 }

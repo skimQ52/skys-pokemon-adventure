@@ -43,10 +43,10 @@ class UserController extends Controller
         $user->increment('xp', $pokemon->hp);
 
         // Check if the user has leveled up
-//        if ($user->xp >= $this->getXpRequiredForNextLevel($user->level)) {
-//            $user->level++;
-//            $user->save();
-//        }
+        if ($user->level >= $user->getLevelFromXp($user->xp)) {
+            $user->level++;
+            $user->save();
+        }
 
         return response()->json([
             'message' => "You caught a {$pokemon->name}!",
