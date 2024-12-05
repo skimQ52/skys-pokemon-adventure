@@ -3,12 +3,20 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import axios from 'axios';
 
-interface Pokemon {
+interface PokemonDetails {
     id: number;
     name: string;
+    type: string;
+    type_2: string | null;
+    sprite_url: string;
+    cry_url: string;
+}
+
+interface Pokemon {
+    id: number;
     level: number;
     is_shiny: boolean;
-    sprite_url: string;
+    pokemon: PokemonDetails;
 }
 
 export default function Collection() {
@@ -18,8 +26,20 @@ export default function Collection() {
     useEffect(() => {
         const fetchUserPokemons = async (): Promise<void> => {
             try {
-                const response = await axios.get<Pokemon[]>('/api/user/pokemons');
-                setUserPokemons(response.data); // Assuming the response is a list of Pokémon
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    console.error('User is not authenticated');
+                    return;
+                }
+
+                const response = await axios.get<Pokemon[]>('/api/user/pokemon', {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        Accept: 'application/json',
+                    },
+                });
+                setUserPokemons(response.data.data);
+                console.log(response.data);
             } catch (error) {
                 console.error('Error fetching user Pokémon:', error);
             } finally {
@@ -45,16 +65,13 @@ export default function Collection() {
                             ) : (
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                                     {userPokemons.map((pokemon) => (
-                                        <div
-                                            key={pokemon.id}
-                                            className="p-4 border rounded-lg shadow-lg"
-                                        >
-                                            <h3 className="text-lg font-bold">{pokemon.name}</h3>
+                                        <div key={pokemon.id} className="p-4 border rounded-lg shadow-lg">
+                                            <h3 className="text-lg font-bold">{pokemon.pokemon.name}</h3>
                                             <p>Level: {pokemon.level}</p>
                                             <p>Shiny: {pokemon.is_shiny ? 'Yes' : 'No'}</p>
                                             <img
-                                                src={pokemon.sprite_url}
-                                                alt={pokemon.name}
+                                                src={pokemon.pokemon.sprite_url}
+                                                alt={pokemon.pokemon.name}
                                                 className="w-32 h-32 object-cover mt-4"
                                             />
                                         </div>

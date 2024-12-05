@@ -11,7 +11,8 @@ class PokemonController extends Controller
     public function getUserPokemons(Request $request)
     {
         // Fetch the authenticated user and their related pokemons (through the user_pokemons table)
-        $user = $request->user();
+        /** @var User $user */
+        $user = auth()->user();
 
         // Load the user_pokemons relationship with the related pokemon data
         $userPokemons = $user->userPokemons()->with('pokemon')->get();
@@ -22,7 +23,8 @@ class PokemonController extends Controller
 
     public function getUserPokemon(Request $request, $pokemonId)
     {
-        $user = $request->user();
+        /** @var User $user */
+        $user = auth()->user();
 
         // Find the user Pokémon by ID and ensure it belongs to the authenticated user
         $userPokemon = $user->userPokemons()

@@ -4,7 +4,7 @@ export default function ApplicationLogo(props) {
             {...props}
             viewBox="0 0 595.3 594.1"
             xmlns="http://www.w3.org/2000/svg"
-            xmlns:xlink="http://www.w3.org/1999/xlink"
+            xmlnsXlink="http://www.w3.org/1999/xlink"
             style={{ enableBackground: "new 0 0 595.3 594.1" }}
         >
             <style type="text/css">

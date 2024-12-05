@@ -15,6 +15,11 @@ class UserPokemonResource extends JsonResource
     public function toArray($request)
     {
         // Returning related Pokemon data along with UserPokemon attributes
+        $spriteURL = $this->pokemon->sprite_url;
+        if ($this->is_shiny) {
+            $spriteURL = preg_replace('/(\/[0-9]+\.png)$/', '/shiny$1', $spriteURL);
+        }
+
         return [
             'id' => $this->id,
             'level' => $this->level,
@@ -24,7 +29,7 @@ class UserPokemonResource extends JsonResource
                 'name' => $this->pokemon->name,
                 'type' => $this->pokemon->type,
                 'type_2' => $this->pokemon->type_2,
-                'sprite_url' => $this->pokemon->sprite_url,
+                'sprite_url' => $spriteURL,
                 'cry_url' => $this->pokemon->cry_url,
             ],
         ];

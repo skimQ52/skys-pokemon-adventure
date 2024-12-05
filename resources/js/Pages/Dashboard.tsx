@@ -66,7 +66,7 @@ export default function Dashboard() {
 
                     <div className="mt-4">
                         <Link
-                            href="/collection"
+                            href={route('collection')}
                             className="px-6 py-3 text-white bg-green-500 rounded-md hover:bg-green-600"
                         >
                             Collection
