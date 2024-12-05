@@ -5,11 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\user;
 use App\Services\PokemonService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
-class UserController extends Controller
+class EncounterController extends Controller
 {
-    public function catchPokemon(): JsonResponse
+    public function encounter(): JsonResponse
     {
         /** @var User $user */
         $user = auth()->user();
@@ -18,8 +17,8 @@ class UserController extends Controller
         // Select a weighted random Pokémon based on the user's level
         $pokemon = $pokemonService->spawnPokemon($user);
 
-        // Generate a level for the caught Pokémon, capped at the user's level
-        $level = rand(1, $user->level);
+        // Generate a level for the caught Pokémon, capped at the user's level, hard-capped at 100
+        $level = min(max(rand(1, $user->level), 1), 100);
 
         // Does the pokemon run away or not
         $isRunAway = $pokemonService->shouldPokemonRunAway($pokemon->base_experience, $user->level, $level);
@@ -33,7 +32,7 @@ class UserController extends Controller
         $isShiny = rand(1,8000) == 8000;
 
         // Add the Pokémon to the user's collection
-        $userPokemon = $user->pokemons()->create([
+        $userPokemon = $user->userPokemons()->create([
             'pokemon_id' => $pokemon->id,
             'level' => $level,
             'is_shiny' => $isShiny,
@@ -43,13 +42,12 @@ class UserController extends Controller
         $user->increment('xp', $pokemon->hp);
 
         // Check if the user has leveled up
-        if ($user->level >= $user->getLevelFromXp($user->xp)) {
-            $user->level++;
-            $user->save();
-        }
+        $user->update([
+            'level' => $user->getLevelFromXp($user->xp),
+        ]);
 
         return response()->json([
-            'message' => "You caught a {$pokemon->name}!",
+            'message' => "You caught a {$pokemon->name}! And gained {$pokemon->hp} experience.",
             'pokemon' => $userPokemon,
         ]);
     }

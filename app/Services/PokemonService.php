@@ -9,8 +9,7 @@ class PokemonService
 {
     public function spawnPokemon(User $user)
     {
-        $maxLevel = $user->level;
-        $pokemons = Pokemon::where('base_experience', '<=', 40 + $maxLevel * 5)->get(); // Filter Pokemon within a reasonable range of base_experience
+        $pokemons = Pokemon::query()->where('base_experience', '<=', 40 + $user->level * 5)->get();
 
         // Weight calculation: Inverse proportional weighting
         $weights = $pokemons->mapWithKeys(function ($pokemon) {
