@@ -14,4 +14,5 @@ Route::post('/login', [LoginController::class, 'apiLogin']);
 
 Route::post('/encounter', [EncounterController::class, 'encounter'])->name('encounter')->middleware('auth:sanctum');
 
+Route::middleware('auth:sanctum')->get('/user/pokemon/{pokemonId}', [PokemonController::class, 'getUserPokemon']);
 Route::middleware('auth:sanctum')->get('/user/pokemon', [PokemonController::class, 'getUserPokemons']);
