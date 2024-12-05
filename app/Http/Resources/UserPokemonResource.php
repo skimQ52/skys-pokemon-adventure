@@ -28,7 +28,7 @@ class UserPokemonResource extends JsonResource
                 'id' => $this->pokemon->id,
                 'name' => $this->pokemon->name,
                 'type' => $this->pokemon->type,
-                'type_2' => $this->pokemon->type_2,
+                'type2' => $this->pokemon->type2,
                 'sprite_url' => $spriteURL,
                 'cry_url' => $this->pokemon->cry_url,
             ],
