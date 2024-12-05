@@ -19,8 +19,8 @@ const getTypeBackgroundColor = (type: string, type2?: string) => {
         bug: 'from-lime-500 to-lime-300',
         flying: 'from-sky-500 to-sky-300',
         normal: 'from-white to-gray-100',
-        fairy: 'from-pink-500 to-pink-200',
-        psychic: 'from-pink-600 to-pink-300',
+        fairy: 'from-pink-500 to-pink-300',
+        psychic: 'from-pink-700 to-pink-500',
         electric: 'from-yellow-500 to-yellow-200',
         fighting: 'from-orange-600 to-orange-400',
         dark: 'from-neutral-800 to-neutral-600',
@@ -33,33 +33,29 @@ const getTypeBackgroundColor = (type: string, type2?: string) => {
         ice: 'from-cyan-500 to-cyan-300',
     };
 
-    // Get the gradient for the primary type
     let primaryTypeGradient = typeColors[type] || 'from-gray-700 to-gray-600';
 
-    // If there's no secondary type, return just the gradient based on the primary type
     if (!type2) {
         return `bg-gradient-to-r ${primaryTypeGradient}`;
     }
 
     const secondaryTypeGradient = typeColors[type2] || 'from-gray-700 to-gray-600';
 
-    // Split the gradients into "from" and "to" parts
     const [primaryFrom, primaryTo] = primaryTypeGradient.split(' ');
     const [secondaryFrom, secondaryTo] = secondaryTypeGradient.split(' ');
 
-    // Return a gradient that blends both types
     return `bg-gradient-to-r ${primaryFrom} ${secondaryTo}`;
 };
 
-const PokemonCard: React.FC<PokemonCardProps> = ({ pokemon }) => {
-    const { name, level, sprite_url, type, type2 } = pokemon;
+const PokemonCard: React.FC<PokemonCardProps> = ({ level, pokemon }) => {
+    const { name, sprite_url, type, type2 } = pokemon;
     const typeBgColor = getTypeBackgroundColor(type, type2);
 
     return (
         <div
             className={`p-4 border-none rounded-lg shadow-lg ${typeBgColor} relative`}
         >
-            <div className="absolute top-2 right-2 text-white font-bold text-xl">{level}</div>
+            <div className="absolute top-3 right-3 text-gray-600 font-bold text-2xl"><span className="text-lg">Lvl </span>{level}</div>
             <h3 className="text-lg font-bold">{name}</h3>
             <div className="flex justify-center mt-4">
                 <img
