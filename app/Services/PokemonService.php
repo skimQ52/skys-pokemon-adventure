@@ -44,7 +44,7 @@ class PokemonService
         // Calculate the final runaway chance (higher values mean higher chance of running away)
         $runawayChance = $baseExpWeight + $pokemonLevelWeight - $userLevelWeight;
 
-        $runawayChance = max(5, min($runawayChance, 95));
+        $runawayChance = max(10, min($runawayChance, 90));
 
         $randomChance = rand(0, 100);
 

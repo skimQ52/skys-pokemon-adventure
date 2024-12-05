@@ -13,12 +13,32 @@ export default function Login({ status, canResetPassword }) {
         remember: false,
     });
 
-    const submit = (e) => {
+    const submit = async (e) => {
         e.preventDefault();
 
-        post(route('login'), {
-            onFinish: () => reset('password'),
-        });
+        // First, make the API login request
+        try {
+            const apiLoginResponse = await axios.post(route('api.login'), {
+                email: data.email,
+                password: data.password,
+            });
+
+            // If the API login is successful and we get the token
+            if (apiLoginResponse.data.token) {
+                // Store the token in localStorage
+                localStorage.setItem('token', apiLoginResponse.data.token);
+            }
+
+            // After storing the token, proceed with Breeze login
+            post(route('login'), {
+                onSuccess: () => {
+                    // Reset the password field after successful login
+                    reset('password');
+                },
+            });
+        } catch (error) {
+            console.error('Error during API login:', error);
+        }
     };
 
     return (

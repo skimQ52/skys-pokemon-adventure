@@ -10,7 +10,7 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::post('/login', [LoginController::class, 'apiLogin']);
+Route::post('/login', [LoginController::class, 'apiLogin'])->name('api.login');
 
 Route::post('/encounter', [EncounterController::class, 'encounter'])->name('encounter')->middleware('auth:sanctum');
 
