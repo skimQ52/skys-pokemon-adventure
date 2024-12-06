@@ -36,6 +36,7 @@ const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
     const [showConfirmDialog, setShowConfirmDialog] = useState(false);
     const [showMergeModal, setShowMergeModal] = useState(false);
     const [showEvolveDialog, setShowEvolveDialog] = useState(false);
+    const [showTooltip, setShowTooltip] = useState(false);
     const [level, setLevel] = useState(0)
 
     useEffect(() => {
@@ -151,13 +152,19 @@ const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
                             className={`px-4 py-2 ${
                                 level >= pokemon.evolution_level ? 'bg-blue-600' : 'bg-gray-400 cursor-not-allowed'
                             } text-white rounded-lg`}
+                            onMouseEnter={() => setShowTooltip(level < pokemon?.evolution_level)}
+                            onMouseLeave={() => setShowTooltip(false)}
                             onClick={() => {
                                 if (level >= pokemon?.evolution_level) setShowEvolveDialog(true);
                             }}
-                            disabled={level < pokemon.evolution_level}
                         >
                             Evolve
                         </button>
+                        {showTooltip && (
+                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 p-2 bg-gray-700 text-white text-sm rounded shadow-lg">
+                                Evolves to {pokemon.next_evolution} at Lvl {pokemon.evolution_level}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
