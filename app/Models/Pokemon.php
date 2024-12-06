@@ -22,5 +22,7 @@ class Pokemon extends Model
         'sprite_url',
         'cry_url',
         'base_experience',
+        'next_evolution',
+        'evolution_level',
     ];
 }
