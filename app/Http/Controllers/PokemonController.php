@@ -80,4 +80,16 @@ class PokemonController extends Controller
         // Return the specific user's Pokémon as a resource
         return new UserPokemonResource($userPokemon);
     }
+
+    public function release($id)
+    {
+        /** @var User $user */
+        $user = auth()->user();
+
+        $userPokemon = $user->userPokemons()->findOrFail($id);
+        $userPokemon->delete();
+
+        return response()->json(['message' => 'Pokémon released successfully']);
+    }
+
 }

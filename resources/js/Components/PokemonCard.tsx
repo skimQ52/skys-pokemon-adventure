@@ -53,7 +53,7 @@ const PokemonCard: React.FC<PokemonCardProps> = ({ level, pokemon }) => {
 
     return (
         <div
-            className={`p-4 border-none rounded-lg shadow-lg ${typeBgColor} relative`}
+            className={`cursor-pointer p-4 border-none rounded-lg shadow-lg ${typeBgColor} relative`}
         >
             <div className="absolute top-3 right-3 text-gray-600 font-bold text-2xl"><span className="text-lg">Lvl </span>{level}</div>
             <h3 className="text-lg font-bold">{name}</h3>

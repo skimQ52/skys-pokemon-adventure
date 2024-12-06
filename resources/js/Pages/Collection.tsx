@@ -3,6 +3,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import axios from 'axios';
 import PokemonCard from '../Components/PokemonCard';
+import PokemonDetailModal from '../Components/PokemonDetailModal';
 
 interface PokemonDetails {
     id: number;
@@ -25,38 +26,44 @@ export default function Collection() {
     const [loading, setLoading] = useState<boolean>(true);
     const [searchTerm, setSearchTerm] = useState<string>('');
     const [typeFilter, setTypeFilter] = useState<string>('');
-    const [sortBy, setSortBy] = useState<string>('most_recent'); // Default sorting by most recent
+    const [sortBy, setSortBy] = useState<string>('most_recent');
+    const [selectedPokemon, setSelectedPokemon] = useState<Pokemon | null>(null);
+
+    const fetchUserPokemons = async (): Promise<void> => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                console.error('User is not authenticated');
+                return;
+            }
+
+            const response = await axios.get<Pokemon[]>('/api/user/pokemon', {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    Accept: 'application/json',
+                },
+                params: {
+                    search: searchTerm,
+                    type: typeFilter,
+                    sort_by: sortBy,
+                },
+            });
+            setUserPokemons(response.data.data);
+        } catch (error) {
+            console.error('Error fetching user Pokémon:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchUserPokemons = async (): Promise<void> => {
-            try {
-                const token = localStorage.getItem('token');
-                if (!token) {
-                    console.error('User is not authenticated');
-                    return;
-                }
-
-                const response = await axios.get<Pokemon[]>('/api/user/pokemon', {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        Accept: 'application/json',
-                    },
-                    params: {
-                        search: searchTerm,
-                        type: typeFilter,
-                        sort_by: sortBy,
-                    },
-                });
-                setUserPokemons(response.data.data);
-            } catch (error) {
-                console.error('Error fetching user Pokémon:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchUserPokemons();
     }, [searchTerm, typeFilter, sortBy]); // Re-fetch data whenever search, typeFilter, or sortBy changes
+
+    const handlePokemonReleased = () => {
+        setLoading(true);
+        fetchUserPokemons();
+    };
 
     return (
         <AuthenticatedLayout>
@@ -128,7 +135,9 @@ export default function Collection() {
                             ) : (
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                                     {userPokemons.map((pokemon) => (
-                                        <PokemonCard key={pokemon.id} pokemon={pokemon.pokemon} level={pokemon.level}/>
+                                        <div key={pokemon.id} onClick={() => setSelectedPokemon(pokemon)}>
+                                            <PokemonCard pokemon={pokemon.pokemon} level={pokemon.level}/>
+                                        </div>
                                     ))}
                                 </div>
                             )}
@@ -136,6 +145,14 @@ export default function Collection() {
                     </div>
                 </div>
             </div>
+            <PokemonDetailModal
+                id={selectedPokemon?.id}
+                pokemon={selectedPokemon?.pokemon || null}
+                level={selectedPokemon?.level || 0}
+                isOpen={!!selectedPokemon}
+                onClose={() => setSelectedPokemon(null)}
+                onPokemonReleased={handlePokemonReleased}
+            />
         </AuthenticatedLayout>
     );
 }
