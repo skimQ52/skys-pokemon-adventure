@@ -49,6 +49,7 @@ const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
             const token = localStorage.getItem('token');
             if (!token) throw new Error('No authentication token found');
 
+            // noinspection JSAnnotator
             await axios.delete(`/api/user/pokemon/${id}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -106,13 +107,13 @@ const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
                         </button>
                         <button
                             className="px-4 py-2 bg-yellow-500 text-white rounded-lg"
-                            onClick={() => console.log(`Merge ${pokemon.name}`)}
+                            onClick={() => console.log(`Merge`)}
                         >
                             Merge
                         </button>
                         <button
                             className="px-4 py-2 bg-blue-600 text-white rounded-lg"
-                            onClick={() => console.log(`Evolve ${pokemon.name}`)}
+                            onClick={() => console.log(`Evolve`)}
                         >
                             Evolve
                         </button>
