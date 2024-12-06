@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import axios from "axios";
+import SelectiveMergeModal from "./SelectiveMergeModal";
 
 interface PokemonDetails {
     id: number;
@@ -8,6 +9,8 @@ interface PokemonDetails {
     type2: string | null;
     sprite_url: string;
     cry_url: string;
+    next_evolution: string;
+    evolution_level: number;
 }
 
 interface PokemonDetailModalProps {
@@ -29,6 +32,7 @@ const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
 }) => {
 
     const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+    const [showMergeModal, setShowMergeModal] = useState(false);
 
     useEffect(() => {
         if (isOpen && pokemon) {
@@ -107,13 +111,13 @@ const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
                         </button>
                         <button
                             className="px-4 py-2 bg-yellow-500 text-white rounded-lg"
-                            onClick={() => console.log(`Merge`)}
+                            onClick={() => setShowMergeModal(true)}
                         >
                             Merge
                         </button>
                         <button
                             className="px-4 py-2 bg-blue-600 text-white rounded-lg"
-                            onClick={() => console.log(`Evolve`)}
+                            onClick={() => console.log(`Evolve at ${pokemon?.evolution_level}`)}
                         >
                             Evolve
                         </button>
@@ -143,6 +147,13 @@ const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
                         </div>
                     </div>
                 </div>
+            )}
+            {showMergeModal && (
+                <SelectiveMergeModal
+                    pokemonName={pokemon.name}
+                    excludedPokemonId={id}
+                    onClose={() => setShowMergeModal(false)}
+                />
             )}
         </div>
     );

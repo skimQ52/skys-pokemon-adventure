@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Pokemon;
 use App\Models\User;
+use Illuminate\Support\Collection;
 
 class PokemonService
 {
@@ -49,5 +50,29 @@ class PokemonService
         $randomChance = rand(0, 100);
 
         return $randomChance < $runawayChance;
+    }
+
+    public function getNewLevelFromMerge(int $level, Collection $mergePokemons): mixed
+    {
+        // Initialize variables
+        $totalLevelGain = 0;
+        $currentTargetLevel = $level;
+
+        // Calculate level gain based on diminishing returns
+        foreach ($mergePokemons as $mergePokemon) {
+            // Diminishing returns formula: merge Pokémon's level * scaling factor
+            // Scaling factor reduces as the target level increases
+            $scalingFactor = 1 / (1 + ($currentTargetLevel / 50)); // Example: higher target levels reduce scaling
+            $levelGain = floor($mergePokemon->level * $scalingFactor);
+
+            // Add to total level gain
+            $totalLevelGain += $levelGain;
+
+            // Update the target level for the next iteration to apply diminishing returns
+            $currentTargetLevel += $levelGain;
+        }
+
+        // Cap levels to a max of 100
+        return min($level + $totalLevelGain, 100);
     }
 }

@@ -31,6 +31,8 @@ class UserPokemonResource extends JsonResource
                 'type2' => $this->pokemon->type2,
                 'sprite_url' => $spriteURL,
                 'cry_url' => $this->pokemon->cry_url,
+                'next_evolution' => $this->pokemon->next_evolution,
+                'evolution_level' => $this->pokemon->evolution_level,
             ],
         ];
     }

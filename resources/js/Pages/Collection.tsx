@@ -12,6 +12,8 @@ interface PokemonDetails {
     type2: string | null;
     sprite_url: string;
     cry_url: string;
+    next_evolution: string;
+    evolution_level: number;
 }
 
 interface Pokemon {

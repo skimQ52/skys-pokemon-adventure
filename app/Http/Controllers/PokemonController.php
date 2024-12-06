@@ -4,10 +4,21 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Http\Resources\UserPokemonResource;
+use App\Models\UserPokemon;
+use App\Services\PokemonService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 
 class PokemonController extends Controller
 {
+
+    protected PokemonService $pokemonService;
+
+    public function __construct(PokemonService $pokemonService)
+    {
+        $this->pokemonService = $pokemonService;
+    }
+
     public function getUserPokemons(Request $request)
     {
         // Fetch the authenticated user and their related pokemons (through the user_pokemons table)
@@ -90,6 +101,49 @@ class PokemonController extends Controller
         $userPokemon->delete();
 
         return response()->json(['message' => 'Pokémon released successfully']);
+    }
+
+    public function merge(Request $request)
+    {
+        $request->validate([
+            'target_id' => 'required|integer|exists:user_pokemons,id',
+            'merge_ids' => 'required|array',
+            'merge_ids.*' => 'integer|exists:user_pokemons,id',
+        ]);
+
+        /** @var User $user */
+        $user = auth()->user();
+
+        $targetPokemon = $user->userPokemons()
+            ->where('id', $request->target_id)
+            ->firstOrFail();
+
+        // Fetch Pokémon to be merged
+        $mergePokemons = $user->userPokemons()
+            ->whereIn('id', $request->merge_ids)
+            ->get();
+
+        if ($mergePokemons->isEmpty()) {
+            return response()->json(['error' => 'No valid Pokémon to merge.'], 400);
+        }
+        $newLevel = $this->pokemonService->getNewLevelFromMerge($targetPokemon->level, $mergePokemons);
+
+        // Update the target Pokémon's level
+        $targetPokemon->level = $newLevel;
+        $targetPokemon->save();
+
+        // Delete the merged Pokémon
+        $user->userPokemons()
+            ->whereIn('id', $request->merge_ids)
+            ->delete();
+
+        return response()->json([
+            'message' => 'Pokémon merged successfully!',
+            'target_pokemon' => [
+                'id' => $targetPokemon->id,
+                'level' => $targetPokemon->level,
+            ],
+        ]);
     }
 
 }
