@@ -35,6 +35,7 @@ const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
 
     const [showConfirmDialog, setShowConfirmDialog] = useState(false);
     const [showMergeModal, setShowMergeModal] = useState(false);
+    const [showEvolveDialog, setShowEvolveDialog] = useState(false);
     const [level, setLevel] = useState(0)
 
     useEffect(() => {
@@ -68,6 +69,28 @@ const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
             onPokemonReleased(); // Trigger callback to refresh collection or UI
         } catch (error) {
             console.error('Failed to release Pokémon:', error);
+        }
+    };
+
+    const handleEvolve = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) throw new Error('No authentication token found');
+
+            await axios.post(
+                `/api/user/pokemon/${id}/evolve`,
+                {},
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+            setShowEvolveDialog(false);
+            onClose();
+            onMergeComplete(); // TODO: Right now it ends up staying where it was with search an all, should do animation or something
+        } catch (error) {
+            console.error('Failed to evolve Pokémon:', error);
         }
     };
 
@@ -125,8 +148,13 @@ const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
                             Merge
                         </button>
                         <button
-                            className="px-4 py-2 bg-blue-600 text-white rounded-lg"
-                            onClick={() => console.log(`Evolve at ${pokemon?.evolution_level}`)}
+                            className={`px-4 py-2 ${
+                                level >= pokemon.evolution_level ? 'bg-blue-600' : 'bg-gray-400 cursor-not-allowed'
+                            } text-white rounded-lg`}
+                            onClick={() => {
+                                if (level >= pokemon?.evolution_level) setShowEvolveDialog(true);
+                            }}
+                            disabled={level < pokemon.evolution_level}
                         >
                             Evolve
                         </button>
@@ -164,6 +192,30 @@ const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
                     onClose={() => setShowMergeModal(false)}
                     onMergeComplete={handleMerge}
                 />
+            )}
+            {showEvolveDialog && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm">
+                        <h3 className="text-lg font-bold mb-4">Evolve Pokémon</h3>
+                        <p className="text-gray-600 mb-6 text-center">
+                            Are you sure you want to evolve {pokemon.name}? This action is irreversible!
+                        </p>
+                        <div className="flex justify-between gap-3">
+                            <button
+                                className="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg"
+                                onClick={() => setShowEvolveDialog(false)}
+                            >
+                                No, I'm not ready.
+                            </button>
+                            <button
+                                className="px-4 py-2 bg-blue-600 text-white rounded-lg"
+                                onClick={handleEvolve}
+                            >
+                                Yes, I'm sure!
+                            </button>
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     );

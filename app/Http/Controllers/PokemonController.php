@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Pokemon;
 use App\Models\User;
 use App\Http\Resources\UserPokemonResource;
 use App\Models\UserPokemon;
@@ -146,4 +147,26 @@ class PokemonController extends Controller
         ]);
     }
 
+    public function evolve($id)
+    {
+        /** @var User $user */
+        $user = auth()->user();
+
+        $userPokemon = $user->userPokemons()->findOrFail($id);
+
+        if ($userPokemon->level < $userPokemon->pokemon->evolution_level) {
+            return response()->json(['error' => 'Pokémon level too low to evolve.'], 400);
+        }
+
+        $nextEvolution = Pokemon::query()->where('name', $userPokemon->pokemon->next_evolution)->first();
+
+        if (!$nextEvolution) {
+            return response()->json(['error' => 'No evolution available.'], 400);
+        }
+
+        $userPokemon->pokemon_id = $nextEvolution->id;
+        $userPokemon->save();
+
+        return response()->json(['message' => 'Pokémon evolved successfully!']);
+    }
 }

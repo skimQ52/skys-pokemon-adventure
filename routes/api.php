@@ -16,5 +16,6 @@ Route::post('/encounter', [EncounterController::class, 'encounter'])->name('enco
 
 Route::middleware('auth:sanctum')->get('/user/pokemon/{pokemonId}', [PokemonController::class, 'getUserPokemon']);
 Route::middleware('auth:sanctum')->delete('/user/pokemon/{pokemonId}', [PokemonController::class, 'release']);
+Route::middleware('auth:sanctum')->post('/user/pokemon/{pokemonId}/evolve', [PokemonController::class, 'evolve']);
 Route::middleware('auth:sanctum')->post('/user/pokemon/merge', [PokemonController::class, 'merge']);
 Route::get('/user/pokemon', [PokemonController::class, 'getUserPokemons'])->name('user.pokemons')->middleware('auth:sanctum');
