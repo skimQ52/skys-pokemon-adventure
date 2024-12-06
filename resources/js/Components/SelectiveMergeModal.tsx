@@ -14,12 +14,14 @@ interface SelectiveMergeModalProps {
     pokemonName: string;
     excludedPokemonId: string;
     onClose: () => void;
+    onMergeComplete?: () => void;
 }
 
 const SelectiveMergeModal: React.FC<SelectiveMergeModalProps> = ({
     pokemonName,
     excludedPokemonId,
     onClose,
+    onMergeComplete,
 }) => {
     const [pokemonList, setPokemonList] = useState<PokemonInstance[]>([]);
     const [selectedPokemon, setSelectedPokemon] = useState<Set<number>>(new Set());
@@ -87,6 +89,10 @@ const SelectiveMergeModal: React.FC<SelectiveMergeModalProps> = ({
 
             setLoading(false);
             onClose();
+
+            if (onMergeComplete) {
+                onMergeComplete();
+            }
         } catch (error) {
             console.error('Failed to merge Pokémon:', error);
             setLoading(false);

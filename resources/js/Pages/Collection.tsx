@@ -62,7 +62,7 @@ export default function Collection() {
         fetchUserPokemons();
     }, [searchTerm, typeFilter, sortBy]); // Re-fetch data whenever search, typeFilter, or sortBy changes
 
-    const handlePokemonReleased = () => {
+    const handleReset = () => {
         setLoading(true);
         fetchUserPokemons();
     };
@@ -150,10 +150,11 @@ export default function Collection() {
             <PokemonDetailModal
                 id={selectedPokemon?.id}
                 pokemon={selectedPokemon?.pokemon || null}
-                level={selectedPokemon?.level || 0}
+                poke_level={selectedPokemon?.level || 0}
                 isOpen={!!selectedPokemon}
                 onClose={() => setSelectedPokemon(null)}
-                onPokemonReleased={handlePokemonReleased}
+                onPokemonReleased={handleReset}
+                onMergeComplete={handleReset}
             />
         </AuthenticatedLayout>
     );

@@ -16,28 +16,32 @@ interface PokemonDetails {
 interface PokemonDetailModalProps {
     id: string;
     pokemon: PokemonDetails | null;
-    level: number;
+    poke_level: number;
     isOpen: boolean;
     onClose: () => void;
     onPokemonReleased: () => void;
+    onMergeComplete: () => void;
 }
 
 const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
     id,
     pokemon,
-    level,
+    poke_level,
     isOpen,
     onClose,
     onPokemonReleased,
+    onMergeComplete,
 }) => {
 
     const [showConfirmDialog, setShowConfirmDialog] = useState(false);
     const [showMergeModal, setShowMergeModal] = useState(false);
+    const [level, setLevel] = useState(0)
 
     useEffect(() => {
         if (isOpen && pokemon) {
             const audio = new Audio(pokemon.cry_url);
             audio.play();
+            setLevel(poke_level)
         }
     }, [isOpen, pokemon]);
 
@@ -66,6 +70,11 @@ const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
             console.error('Failed to release Pokémon:', error);
         }
     };
+
+    const handleMerge = () => {
+        onMergeComplete();
+        onClose();
+    }
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -153,6 +162,7 @@ const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
                     pokemonName={pokemon.name}
                     excludedPokemonId={id}
                     onClose={() => setShowMergeModal(false)}
+                    onMergeComplete={handleMerge}
                 />
             )}
         </div>
