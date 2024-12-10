@@ -39,7 +39,7 @@ class EncounterController extends Controller
             ]);
         }
 
-        $isShiny = rand(1,2) == 2;
+        $isShiny = rand(1,8000) == 8000;
 
         // Add the Pokémon to the user's collection
         $userPokemon = $user->userPokemons()->create([
