@@ -17,7 +17,7 @@ class UserPokemonResource extends JsonResource
         // Returning related Pokemon data along with UserPokemon attributes
         $spriteURL = $this->pokemon->sprite_url;
         if ($this->is_shiny) {
-            $spriteURL = preg_replace('/(\/[0-9]+\.png)$/', '/shiny$1', $spriteURL);
+            $spriteURL = $this->makeSpriteUrlShiny($spriteURL);
         }
 
         return [
@@ -35,5 +35,10 @@ class UserPokemonResource extends JsonResource
                 'evolution_level' => $this->pokemon->evolution_level,
             ],
         ];
+    }
+
+    public function makeSpriteUrlShiny($spriteURL): string|array|null
+    {
+        return preg_replace('/(\/[0-9]+\.png)$/', '/shiny$1', $spriteURL);
     }
 }

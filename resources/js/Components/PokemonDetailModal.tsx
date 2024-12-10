@@ -38,6 +38,8 @@ const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
     const [showEvolveDialog, setShowEvolveDialog] = useState(false);
     const [showTooltip, setShowTooltip] = useState(false);
     const [level, setLevel] = useState(0)
+    const [isEvolving, setIsEvolving] = useState(false);
+    const [evolvedPokemon, setEvolvedPokemon] = useState<PokemonDetails | null>(null);
 
     useEffect(() => {
         if (isOpen && pokemon) {
@@ -78,7 +80,8 @@ const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
             const token = localStorage.getItem('token');
             if (!token) throw new Error('No authentication token found');
 
-            await axios.post(
+            setIsEvolving(true); // Start animation
+            const response = await axios.post(
                 `/api/user/pokemon/${id}/evolve`,
                 {},
                 {
@@ -87,11 +90,15 @@ const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
                     },
                 }
             );
-            setShowEvolveDialog(false);
-            onClose();
-            onMergeComplete(); // TODO: Right now it ends up staying where it was with search an all, should do animation or something
+            setTimeout(() => {
+                setEvolvedPokemon(response.data);
+                setIsEvolving(false);
+                const cryAudio = new Audio(response.data.cry_url);
+                cryAudio.play();
+            }, 5000);
         } catch (error) {
             console.error('Failed to evolve Pokémon:', error);
+            setIsEvolving(false);
         }
     };
 
@@ -150,18 +157,23 @@ const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
                         </button>
                         <button
                             className={`px-4 py-2 ${
-                                level >= pokemon.evolution_level ? 'bg-blue-600' : 'bg-gray-400 cursor-not-allowed'
+                                !pokemon?.evolution_level || level < pokemon.evolution_level
+                                    ? 'bg-gray-400 cursor-not-allowed'
+                                    : 'bg-blue-600'
                             } text-white rounded-lg`}
                             onMouseEnter={() => setShowTooltip(level < pokemon?.evolution_level)}
                             onMouseLeave={() => setShowTooltip(false)}
                             onClick={() => {
-                                if (level >= pokemon?.evolution_level) setShowEvolveDialog(true);
+                                if (pokemon?.evolution_level && level >= pokemon.evolution_level) {
+                                    setShowEvolveDialog(true);
+                                }
                             }}
                         >
                             Evolve
                         </button>
                         {showTooltip && (
-                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 p-2 bg-gray-700 text-white text-sm rounded shadow-lg">
+                            <div
+                                className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 p-2 bg-gray-700 text-white text-sm rounded shadow-lg">
                                 Evolves to {pokemon.next_evolution} at Lvl {pokemon.evolution_level}
                             </div>
                         )}
@@ -221,6 +233,45 @@ const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
                                 Yes, I'm sure!
                             </button>
                         </div>
+                    </div>
+                </div>
+            )}
+            {isEvolving && (
+                <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+                    <div className="relative bg-white rounded-lg shadow-lg p-6 w-full max-w-md flex flex-col items-center">
+                        <div className="flashing-animation">
+                            <img
+                                src={pokemon.sprite_url}
+                                alt={pokemon.name}
+                                className="w-80 h-80 flashing-pokemon"
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
+            {evolvedPokemon && (
+                <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+                    <div className="relative bg-white rounded-lg shadow-lg p-6 w-full max-w-md flex flex-col items-center">
+                        <h2 className="text-2xl font-bold mb-4">Congratulations!</h2>
+                        <p className="text-center mb-6">
+                            Your <strong>{pokemon.name}</strong> has evolved into <strong>{evolvedPokemon.name}</strong>!
+                        </p>
+                        <img
+                            src={evolvedPokemon.sprite_url}
+                            alt={evolvedPokemon.name}
+                            className="w-80 h-80"
+                        />
+                        <button
+                            className="mt-6 px-4 py-2 bg-blue-600 text-white rounded-lg"
+                            onClick={() => {
+                                setShowEvolveDialog(false);
+                                setEvolvedPokemon(null);
+                                onMergeComplete();
+                                onClose();
+                            }}
+                        >
+                            Continue
+                        </button>
                     </div>
                 </div>
             )}

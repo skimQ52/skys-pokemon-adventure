@@ -9,6 +9,7 @@ use App\Models\UserPokemon;
 use App\Services\PokemonService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use function Psy\debug;
 
 class PokemonController extends Controller
 {
@@ -152,6 +153,7 @@ class PokemonController extends Controller
         /** @var User $user */
         $user = auth()->user();
 
+        /** @var UserPokemon $userPokemon */
         $userPokemon = $user->userPokemons()->findOrFail($id);
 
         if ($userPokemon->level < $userPokemon->pokemon->evolution_level) {
@@ -167,6 +169,17 @@ class PokemonController extends Controller
         $userPokemon->pokemon_id = $nextEvolution->id;
         $userPokemon->save();
 
-        return response()->json(['message' => 'Pokémon evolved successfully!']);
+        $spriteURL = $userPokemon->is_shiny ? $nextEvolution->getShinySpriteURL() : $nextEvolution->sprite_url;
+
+        return response()->json([
+            'id' => $nextEvolution->id,
+            'name' => $nextEvolution->name,
+            'type' => $nextEvolution->type,
+            'type2' => $nextEvolution->type2,
+            'sprite_url' => $spriteURL,
+            'cry_url' => $nextEvolution->cry_url,
+            'next_evolution' => $nextEvolution->next_evolution,
+            'evolution_level' => $nextEvolution->evolution_level,
+        ]);
     }
 }

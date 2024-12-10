@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Pokemon;
 use App\Models\user;
 use App\Services\PokemonService;
 use http\Env\Response;
@@ -22,6 +23,7 @@ class EncounterController extends Controller
         $user = auth()->user();
 
         // Select a weighted random Pokémon based on the user's level
+        /** @var Pokemon $pokemon */
         $pokemon = $this->pokemonService->spawnPokemon($user);
 
         // Generate a level for the caught Pokémon, capped at the user's level, hard-capped at 100
@@ -37,7 +39,7 @@ class EncounterController extends Controller
             ]);
         }
 
-        $isShiny = rand(1,8000) == 8000;
+        $isShiny = rand(1,2) == 2;
 
         // Add the Pokémon to the user's collection
         $userPokemon = $user->userPokemons()->create([
@@ -55,6 +57,8 @@ class EncounterController extends Controller
             'level' => $user->getLevelFromXp($user->xp),
         ]);
 
+        $spriteURL = $userPokemon->is_shiny ? $pokemon->getShinySpriteURL() : $pokemon->sprite_url;
+
         return response()->json([
             'caught' => 'true',
             'message' => "You caught a {$pokemon->name}! And gained {$xpAwarded} experience.",
@@ -62,8 +66,8 @@ class EncounterController extends Controller
                 'name' => $pokemon->name,
                 'level' => $level,
                 'is_shiny' => $isShiny,
-                'sprite_url' => $pokemon->sprite_url, // Ensure this is available in your Pokemon model
-                'cry_url' => $pokemon->cry_url, // Ensure this is available in your Pokemon model
+                'sprite_url' => $spriteURL,
+                'cry_url' => $pokemon->cry_url,
             ],
         ]);
     }

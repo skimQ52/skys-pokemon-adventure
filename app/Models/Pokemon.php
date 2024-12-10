@@ -25,4 +25,9 @@ class Pokemon extends Model
         'next_evolution',
         'evolution_level',
     ];
+
+    public function getShinySpriteURL(): string|array|null
+    {
+        return preg_replace('/(\/[0-9]+\.png)$/', '/shiny$1', $this->sprite_url);
+    }
 }
